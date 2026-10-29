@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SnowBid Contract &amp; Route Pack — Season Contracts, Route Sheets &amp; Storm Logs</title>
+<style>
+  :root{
+    --ink:#16222e; --muted:#5b6b7a; --line:#d7e0e8; --bg:#eef3f7; --card:#ffffff;
+    --accent:#0b6fb8; --accent2:#0a4d80; --good:#1d7a3a; --warn:#b3540a; --bad:#b02a2a;
+    --chip:#e3eef6; --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+  header{background:linear-gradient(135deg,#0a4d80,#0b6fb8);color:#fff;padding:18px 16px 14px}
+  header h1{margin:0;font-size:24px;letter-spacing:.3px}
+  header .sub{opacity:.9;font-size:13px;margin-top:3px}
+  header .co{font-size:13px;margin-top:6px;font-weight:600}
+  nav{display:flex;flex-wrap:wrap;gap:6px;background:#fff;border-bottom:1px solid var(--line);padding:8px 10px;position:sticky;top:0;z-index:5}
+  nav button{border:1px solid var(--line);background:#f4f8fb;border-radius:20px;padding:7px 14px;font-size:14px;cursor:pointer;color:var(--ink)}
+  nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  main{max-width:1020px;margin:0 auto;padding:14px 12px 60px}
+  section.tab{display:none}
+  section.tab.active{display:block}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+  .card h2{margin:0 0 6px;font-size:18px}
+  .card h3{margin:14px 0 6px;font-size:15px}
+  .hint{color:var(--muted);font-size:13px;line-height:1.45}
+  label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.4px}
+  input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-size:15px;background:#fff;color:var(--ink)}
+  textarea{min-height:64px;resize:vertical}
+  textarea.tall{min-height:170px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 14px}
+  @media(max-width:640px){.grid,.grid3{grid-template-columns:1fr}}
+  .btn{display:inline-block;border:none;border-radius:8px;padding:10px 16px;font-size:14.5px;cursor:pointer;background:var(--accent);color:#fff;font-weight:600}
+  .btn:hover{background:var(--accent2)}
+  .btn.ghost{background:#fff;color:var(--accent);border:1px solid var(--accent)}
+  .btn.small{padding:6px 11px;font-size:13px;min-height:40px;}
+  .btn.danger{background:#fff;color:var(--bad);border:1px solid var(--bad)}
+  .btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+  th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  th{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .big{font-size:26px;font-weight:700}
+  .pricebox{background:var(--chip);border-radius:var(--radius);padding:14px;margin-top:12px}
+  .warnbox{background:#fdf0e6;border:1px solid #eec39a;color:#7a3c06;border-radius:8px;padding:10px 12px;font-size:14px;margin-top:10px}
+  .okbox{background:#e8f5ec;border:1px solid #a9d6b6;color:#14532a;border-radius:8px;padding:10px 12px;font-size:14px;margin-top:10px}
+  .chip{display:inline-block;background:var(--chip);border-radius:12px;padding:2px 9px;font-size:12px;margin-right:5px;color:var(--accent2);font-weight:600}
+  .muted{color:var(--muted)}
+  .right{text-align:right}
+  .item{border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;background:#fff}
+  .item .t{font-weight:700;font-size:15.5px}
+  .stat{display:inline-block;margin:2px 14px 2px 0;font-size:13.5px}
+  .stat b{display:block;font-size:17px}
+  .check{display:flex;align-items:flex-start;gap:8px;margin-top:10px}
+  .check input{width:auto;margin-top:3px}
+  .check label{margin:0;text-transform:none;letter-spacing:0;font-size:14px;color:var(--ink);font-weight:400}
+  .hidden{display:none!important}
+  /* ---- print sheet ---- */
+  #printsheet{display:none}
+  @media print{
+    header,nav,main{display:none!important}
+    body{background:#fff}
+    #printsheet{display:block;color:#000;font-size:13.5px;line-height:1.5}
+  }
+  .ps-head{border-bottom:2.5px solid #0a4d80;padding-bottom:8px;margin-bottom:12px}
+  .ps-co{font-size:20px;font-weight:700;color:#0a4d80}
+  .ps-title{font-size:17px;font-weight:700;margin:14px 0 4px}
+  .ps-table{width:100%;border-collapse:collapse;margin:8px 0}
+  .ps-table th,.ps-table td{border:1px solid #bbb;padding:6px 8px;text-align:left;font-size:13px;vertical-align:top}
+  .ps-table th{background:#eef3f7;width:32%}
+  .ps-terms{white-space:pre-wrap;border:1px solid #bbb;padding:10px 12px;margin:10px 0;font-size:12.5px}
+  .ps-sig{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:30px}
+  .ps-sigline{border-top:1px solid #000;margin-top:34px;padding-top:4px;font-size:12px;color:#333}
+  .ps-box{display:inline-block;width:15px;height:15px;border:1.5px solid #000;vertical-align:-2px;margin-right:7px}
+  .ps-small{font-size:11px;color:#444;margin-top:16px;border-top:1px solid #bbb;padding-top:6px}
+  .ps-stop{border:1px solid #bbb;padding:9px 11px;margin-bottom:9px;page-break-inside:avoid}
+</style>
+</head>
+<body>
+<header>
+  <h1>❄️ SnowBid Contract &amp; Route Pack</h1>
+  <div class="sub">Season contracts, per-push agreements, route sheets &amp; storm logs — the paperwork companion to SnowBid.</div>
+  <div class="co" id="hdrCo"></div>
+</header>
+<nav id="topnav">
+  <button data-tab="overview" class="active">Season Overview</button>
+  <button data-tab="contracts">Contracts</button>
+  <button data-tab="routes">Routes</button>
+  <button data-tab="storms">Storm Log</button>
+  <button data-tab="terms">Client Terms Page</button>
+  <button data-tab="settings">Settings &amp; Help</button>
+</nav>
+<main>
+
+<!-- ============ OVERVIEW ============ -->
+<section class="tab active" id="tab-overview">
+  <div class="card">
+    <h2>Season at a glance</h2>
+    <p class="hint">Totals come from your Storm Log and saved contracts. They pair with the season numbers in SnowBid — keep both in step and your end-of-season review takes five minutes.</p>
+    <div id="ovStats"></div>
+  </div>
+  <div class="card">
+    <h2>Contracts snapshot</h2>
+    <div id="ovContracts"></div>
+  </div>
+  <div class="card">
+    <h2>Routes snapshot</h2>
+    <div id="ovRoutes"></div>
+  </div>
+</section>
+
+<!-- ============ CONTRACTS ============ -->
+<section class="tab" id="tab-contracts">
+  <div class="card">
+    <h2 id="cFormTitle">New contract / agreement</h2>
+    <p class="hint">Fill it in once — the pack generates a clean, printable document with your business name, the service terms, and signature lines. The liability &amp; terms text is <b>editable sample language</b>: have a local attorney review it before you rely on it. It is not legal advice.</p>
+    <label>Document type</label>
+    <select id="c_kind">
+      <option value="season">Season Contract (full agreement)</option>
+      <option value="perpush">Per-Push Agreement (short form)</option>
+    </select>
+    <div class="grid">
+      <div><label>Client name *</label><input id="c_client" placeholder="Maple Court HOA"></div>
+      <div><label>Contact person</label><input id="c_contact" placeholder="Property manager / homeowner"></div>
+    </div>
+    <div class="grid3">
+      <div><label>Client phone</label><input id="c_phone"></div>
+      <div><label>Client email</label><input id="c_email"></div>
+      <div><label>Property type</label><select id="c_ptype"><option>Residential</option><option>Commercial</option></select></div>
+    </div>
+    <div class="grid">
+      <div><label>Property label</label><input id="c_property" placeholder="Maple Court — main lot &amp; walks"></div>
+      <div><label>Property address *</label><input id="c_address" placeholder="1200 Maple Ct, Springfield"></div>
+    </div>
+    <div id="cSeasonFields">
+      <div class="grid3">
+        <div><label>Service type</label>
+          <select id="c_stype">
+            <option value="seasonal">Seasonal flat rate</option>
+            <option value="perpush">Per-push</option>
+            <option value="perevent">Per-event</option>
+          </select></div>
+        <div><label>Season start</label><input id="c_start" type="date"></div>
+        <div><label>Season end</label><input id="c_end" type="date"></div>
+      </div>
+      <div class="grid3">
+        <div><label>Season price ($)</label><input inputmode="decimal" id="c_seasonprice" type="number" min="0" step="0.01" placeholder="4800"></div>
+        <div><label>Visit cap (blank = no cap)</label><input inputmode="decimal" id="c_cap" type="number" min="0" step="1" placeholder="20"></div>
+        <div><label>Overage rate ($ / visit past cap)</label><input inputmode="decimal" id="c_overage" type="number" min="0" step="0.01"></div>
+      </div>
+    </div>
+    <div class="grid3">
+      <div><label>Trigger depth (inches)</label><input inputmode="decimal" id="c_trigger" type="number" min="0" step="0.25" value="2"></div>
+      <div><label>Per-push price ($)</label><input inputmode="decimal" id="c_pushprice" type="number" min="0" step="0.01" placeholder="65"></div>
+      <div><label>Per-event price ($)</label><input inputmode="decimal" id="c_eventprice" type="number" min="0" step="0.01" placeholder="310"></div>
+    </div>
+    <div class="grid">
+      <div><label>Salting / de-icing</label>
+        <select id="c_salt">
+          <option value="included">Included in price</option>
+          <option value="perapp">Priced per application</option>
+          <option value="none">Not included</option>
+        </select></div>
+      <div><label>Salt price per application ($)</label><input inputmode="decimal" id="c_saltprice" type="number" min="0" step="0.01"></div>
+    </div>
+    <div class="grid">
+      <div><label>Payment terms</label>
+        <select id="c_payterms">
+          <option>Due in full at signing</option>
+          <option>Monthly installments during the season</option>
+          <option>Net 15 from invoice</option>
+          <option>Net 30 from invoice</option>
+          <option>Due at each service visit</option>
+        </select></div>
+      <div><label>Status</label>
+        <select id="c_status"><option>Draft</option><option>Signed</option><option>Active</option><option>Completed</option></select></div>
+    </div>
+    <label>Payment notes (installment schedule, late fees, etc.)</label>
+    <textarea id="c_paynote" placeholder="e.g. 3 payments of $1,600 due Nov 1, Dec 1, Jan 1. Balances 30+ days past due pause service."></textarea>
+    <label>Liability &amp; service terms (printed on the document — editable sample language)</label>
+    <textarea id="c_terms" class="tall"></textarea>
+    <label>Internal notes (never printed)</label>
+    <textarea id="c_notes" placeholder="Gate code, where the piles go, who to call…"></textarea>
+    <div class="btnrow">
+      <button class="btn" id="c_save">Save contract</button>
+      <button class="btn ghost" id="c_reset">Clear form</button>
+    </div>
+    <div id="c_msg"></div>
+  </div>
+  <div class="card">
+    <h2>Saved contracts &amp; agreements</h2>
+    <div id="contractList"></div>
+  </div>
+</section>
+
+<!-- ============ ROUTES ============ -->
+<section class="tab" id="tab-routes">
+  <div class="card">
+    <h2>Build a route</h2>
+    <p class="hint">A route is an ordered list of stops, in the order you actually drive them. Print the route sheet for the truck, or log each run here when you get back.</p>
+    <div class="grid">
+      <div><label>New route name</label><input id="r_name" placeholder="North Route"></div>
+      <div style="display:flex;align-items:flex-end"><button class="btn" id="r_add">Add route</button></div>
+    </div>
+    <div id="r_msg"></div>
+  </div>
+  <div id="routeList"></div>
+  <div class="card">
+    <h2>Log a completed run</h2>
+    <p class="hint">After a storm, record which stops on a route were serviced. Runs feed the Season Overview totals.</p>
+    <div class="grid3">
+      <div><label>Date</label><input id="run_date" type="date"></div>
+      <div><label>Route</label><select id="run_route"></select></div>
+      <div><label>Snowfall that run (inches, optional)</label><input inputmode="decimal" id="run_snow" type="number" min="0" step="0.25"></div>
+    </div>
+    <label>Stops serviced</label>
+    <div id="run_stops"></div>
+    <div class="btnrow"><button class="btn" id="run_save">Save run</button></div>
+    <div id="run_msg"></div>
+    <h3>Run history</h3>
+    <div id="runHistory"></div>
+  </div>
+</section>
+
+<!-- ============ STORM LOG ============ -->
+<section class="tab" id="tab-storms">
+  <div class="card">
+    <h2>Log a storm event</h2>
+    <p class="hint">One row per storm: what fell, how many properties you serviced, and how much salt went down. End of season, this is the record that proves what the winter actually cost you — and it lines up with the push counts behind your SnowBid season contracts.</p>
+    <div class="grid3">
+      <div><label>Date *</label><input id="s_date" type="date"></div>
+      <div><label>Snowfall (inches) *</label><input inputmode="decimal" id="s_snow" type="number" min="0" step="0.25" placeholder="4.5"></div>
+      <div><label>Properties serviced</label><input inputmode="decimal" id="s_props" type="number" min="0" step="1" placeholder="12"></div>
+    </div>
+    <div class="grid">
+      <div><label>Salt / ice-melt used (lb)</label><input inputmode="decimal" id="s_salt" type="number" min="0" step="1" placeholder="400"></div>
+      <div><label>Crew hours (optional)</label><input inputmode="decimal" id="s_hours" type="number" min="0" step="0.25"></div>
+    </div>
+    <label>Notes</label>
+    <textarea id="s_notes" placeholder="Wet heavy snow, two extra salt runs on the hill lots…"></textarea>
+    <div class="btnrow"><button class="btn" id="s_save">Save storm event</button></div>
+    <div id="s_msg"></div>
+  </div>
+  <div class="card">
+    <h2>Season totals</h2>
+    <div id="stormTotals"></div>
+    <h3>Events</h3>
+    <div id="stormList"></div>
+  </div>
+</section>
+
+<!-- ============ CLIENT TERMS ONE-PAGER ============ -->
+<section class="tab" id="tab-terms">
+  <div class="card">
+    <h2>Client terms one-pager</h2>
+    <p class="hint">Plain-English explanations of the terms clients ask about — trigger depth, visit caps and overage, and salting. Edit the wording to match how you actually run, then print it for new clients or copy the text version into a text message or email.</p>
+    <label>Trigger depth — what it means</label>
+    <textarea id="t_trigger" class="tall"></textarea>
+    <label>Visit cap &amp; overage — how it works</label>
+    <textarea id="t_cap" class="tall"></textarea>
+    <label>Salting / de-icing — what it does and doesn't do</label>
+    <textarea id="t_salt" class="tall"></textarea>
+    <label>Anything else (timing, cars in the way, spring cleanup…)</label>
+    <textarea id="t_extra" class="tall"></textarea>
+    <div class="btnrow">
+      <button class="btn" id="t_save">Save wording</button>
+      <button class="btn ghost" id="t_print">Print one-pager</button>
+      <button class="btn ghost" id="t_copy">Show copyable text</button>
+    </div>
+    <div id="t_msg"></div>
+    <div id="t_textwrap" class="hidden">
+      <label>Plain-text version (select all &amp; copy)</label>
+      <textarea id="t_text" class="tall" readonly></textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SETTINGS & HELP ============ -->
+<section class="tab" id="tab-settings">
+  <div class="card">
+    <h2>Your business</h2>
+    <p class="hint">Prints at the top of every contract, route sheet, and the client terms page.</p>
+    <div class="grid">
+      <div><label>Business name</label><input id="b_name" placeholder="Your Snow Business LLC"></div>
+      <div><label>Owner / operator</label><input id="b_owner"></div>
+    </div>
+    <div class="grid3">
+      <div><label>Phone</label><input id="b_phone"></div>
+      <div><label>Email</label><input id="b_email"></div>
+      <div><label>Mailing address</label><input id="b_address"></div>
+    </div>
+    <label>Default trigger depth (inches) for new contracts</label>
+    <input inputmode="decimal" id="b_trigger" type="number" min="0" step="0.25" value="2">
+    <div class="btnrow"><button class="btn" id="b_save">Save business info</button></div>
+    <div id="b_msg"></div>
+  </div>
+  <div class="card">
+    <h2>Default contract language</h2>
+    <p class="hint">These templates pre-fill the terms box on new contracts. Edit them once here (after your attorney reviews them) and every new contract starts from your wording.</p>
+    <label>Season contract — liability &amp; service terms</label>
+    <textarea id="d_seasonterms" class="tall"></textarea>
+    <label>Per-push agreement — short terms</label>
+    <textarea id="d_pushterms" class="tall"></textarea>
+    <div class="btnrow">
+      <button class="btn" id="d_save">Save templates</button>
+      <button class="btn ghost" id="d_restore">Restore built-in templates</button>
+    </div>
+    <div id="d_msg"></div>
+  </div>
+  <div class="card">
+    <h2>Backup &amp; data</h2>
+    <p class="hint">Everything is stored in this browser on this device — nothing is uploaded anywhere. Export a backup before switching devices or clearing browser data.</p>
+    <div class="btnrow">
+      <button class="btn" id="x_export">Export backup (.json)</button>
+      <button class="btn ghost" id="x_clearDemo">Clear demo data</button>
+      <button class="btn danger" id="x_erase">Erase ALL data</button>
+    </div>
+    <label>Import a backup — choose the .json file…</label>
+    <input id="x_file" type="file" accept=".json,application/json">
+    <label>…or paste backup JSON here</label>
+    <textarea id="x_text" placeholder='{"biz":{…},"contracts":[…]}'></textarea>
+    <div class="btnrow"><button class="btn" id="x_importText">Import pasted backup</button></div>
+    <div id="x_msg"></div>
+  </div>
+  <div class="card">
+    <h2>Help</h2>
+    <h3>How this pack pairs with SnowBid</h3>
+    <p class="hint">SnowBid prices the work — cost per push, margin floor, season price. This pack papers it: the signed contract, the route sheet in the truck, and the storm log that proves what the season actually delivered. When a client's cap is in question, the Storm Log totals and the run history are your evidence; when renewal time comes, the same numbers feed next season's SnowBid pricing.</p>
+    <h3>The documents</h3>
+    <p class="hint"><b>Season Contract</b> — the full agreement: seasonal flat, per-push, or per-event service, trigger depth, visit cap and overage rate, salting, payment terms, and the liability language. <b>Per-Push Agreement</b> — the short form for residential per-push customers: price, trigger, salting, and signatures on one page. <b>Route Sheet</b> — print it, clip it to the visor, check stops off as you clear them. <b>Client Terms Page</b> — the explanations, written for clients, that prevent the three most common disputes (trigger, cap, salt).</p>
+    <h3>⚠️ About the contract language — read this</h3>
+    <p class="hint">The contract templates in this pack are <b>sample planning language, not legal advice</b>. Snow-removal liability — especially slip-and-fall responsibility — is governed by your state's law, your insurance policy, and how your contracts are actually written and signed. Laws and enforceable terms vary widely by state and by residential vs. commercial clients. <b>Have a local attorney review and adapt this language before you use it with clients</b>, and confirm with your insurance agent that your contract terms match what your policy expects. Do not rely on the sample slip-and-fall wording as-is.</p>
+    <h3>Your data</h3>
+    <p class="hint">Stored only in this browser's local storage. Clearing browser site data erases it — export a backup first. Demo records are marked and the one-button clear removes only those, never your real clients.</p>
+  </div>
+<div id="legalSection"></div>
+</section>
+</main>
+
+<div id="printsheet"></div>
+
+<script>
+"use strict";
+/* ================= SnowBid Contract & Route Pack ================= */
+var KEY = "snowbid_contract_pack_v1";
+
+var DEFAULT_SEASON_TERMS =
+"SAMPLE LANGUAGE — PLANNING TEXT ONLY. Have a local attorney review and adapt this language before use; it is not legal advice.\n" +
+"1. TRIGGER DEPTH. Service begins when snowfall accumulation reaches the trigger depth stated in this agreement, measured at the property. Wind drifting, ice, and refreeze after a storm may require additional visits, billed at the overage / per-visit rate.\n" +
+"2. TIMING. Routes are sequenced at the Contractor's discretion. During an ongoing storm, no specific completion time is guaranteed; service is typically completed within a reasonable time after snowfall ends.\n" +
+"3. SLIP-AND-FALL / SNOW & ICE LIABILITY. Snow and ice management reduces, but cannot eliminate, slip hazards, and bare pavement cannot be guaranteed at all times. [SAMPLE: Responsibility for slip-and-fall incidents is allocated as follows: ____________.] Property owner will monitor conditions between visits and promptly notify Contractor of problem areas. REPLACE the bracketed sentence with language your attorney and insurer approve for your state.\n" +
+"4. PROPERTY DAMAGE. Contractor is not responsible for damage to items left within service areas, or for pre-existing pavement or surface defects concealed by snow or ice. Turf or gravel displaced by Contractor's equipment will be noted and repaired in the spring where reasonably possible.\n" +
+"5. ACCESS. Owner will keep service areas reasonably clear of vehicles and obstacles on service days. Areas that cannot be safely serviced may be skipped and are still billable.\n" +
+"6. PAYMENT & SUSPENSION. Amounts are due on the payment terms stated in this agreement. Contractor may pause service on accounts with balances past due until the account is brought current.\n" +
+"7. TERM & CANCELLATION. This agreement covers the season dates stated above. Either party may cancel in writing with 14 days' notice; seasonal amounts are prorated for services already performed.";
+
+var DEFAULT_PUSH_TERMS =
+"SAMPLE LANGUAGE — PLANNING TEXT ONLY. Have a local attorney review before use; not legal advice.\n" +
+"• Service is performed per push when snowfall reaches the trigger depth above, measured at the property. Each visit is billed at the per-push price (plus salting, if selected).\n" +
+"• Routes run in the Contractor's sequence; no exact arrival time is guaranteed during a storm.\n" +
+"• Snow and ice work reduces but cannot eliminate slip hazards; bare pavement is not guaranteed. Owner will keep the driveway clear of vehicles on service days — blocked areas may be skipped and are still billable.\n" +
+"• Payment is due on the terms selected above. Either party may cancel at any time with a phone call or in writing; visits already performed remain billable.";
+
+var DEFAULT_TERMS_PAGE = {
+  trigger: "WHAT \"TRIGGER DEPTH\" MEANS\nYour trigger depth is the amount of snow that has to accumulate before we come out — for most clients that's 2 inches. We measure at your property, not from the TV forecast, because snowfall varies a lot street by street. A storm that drops 1.5 inches doesn't trigger a visit; a storm that drops 2 inches does. During a long storm we may come more than once to keep up — each visit counts the same way. Refreeze and drifting after a storm can also call for a return visit.",
+  cap: "HOW YOUR VISIT CAP & OVERAGE WORK\nIf your season plan includes a visit cap, it covers a set number of service visits for the season (your cap is written on your contract). An average winter uses most of it; a mild winter uses less. If a heavy winter takes us past your cap, extra visits are simply billed at the per-visit overage rate on your contract — no surprise new contract, no renegotiation mid-storm, and we keep servicing your property. You'll always be able to see the count: ask us any time and we'll show you the season log.",
+  salt: "SALTING (DE-ICING) — WHAT IT DOES AND DOESN'T DO\nSalt melts ice and gives tires and shoes traction; it works best when it's down before ice bonds to the pavement and when temperatures aren't far below freezing. What salt can't do is guarantee bare, dry pavement in every condition — extreme cold, freezing rain, and refreeze overnight can still leave slick spots, so please still use care walking to your car in the morning. If salting is included in your plan, we apply it when conditions call for it. If it's priced per application, it's billed only when we actually put it down.",
+  extra: "A FEW THINGS THAT HELP US HELP YOU\n• Please keep cars out of the driveway / lot lanes on storm days when you can — a blocked area may have to be skipped.\n• We run routes continuously during storms, so arrival times vary storm to storm.\n• In spring we walk serviced areas for plow-scraped turf and gravel and tidy up what our equipment disturbed.\nQuestions any time — call or text us. Stay warm!"
+};
+
+/* ---------- helpers ---------- */
+function num(x){ var n = parseFloat(x); return isFinite(n) ? n : 0; }
+function clamp0(x){ var n = num(x); return n < 0 ? 0 : n; }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+function fmtMoney(x){ var n = num(x); return "$" + n.toLocaleString("en-US",{minimumFractionDigits:2, maximumFractionDigits:2}); }
+function fmtNum(x){ var n = num(x); return n.toLocaleString("en-US",{maximumFractionDigits:2}); }
+function fmtDate(iso){
+  if(!iso) return "—";
+  var p = String(iso).split("-"); if(p.length!==3) return esc(iso);
+  var months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var mi = parseInt(p[1],10)-1; if(mi<0||mi>11) return esc(iso);
+  return months[mi] + " " + parseInt(p[2],10) + ", " + p[0];
+}
+var _uid = 0;
+function uid(prefix){ _uid++; return prefix + Date.now().toString(36) + _uid.toString(36); }
+function el(id){ return document.getElementById(id); }
+function val(id){ var e = el(id); return e ? e.value : ""; }
+function setVal(id, v){ var e = el(id); if(e) e.value = (v==null?"":v); }
+function msg(id, text, ok){
+  var e = el(id); if(!e) return;
+  e.innerHTML = text ? '<div class="'+(ok?"okbox":"warnbox")+'">'+text+"</div>" : "";
+}
+
+/* ---------- state ---------- */
+function blankState(){
+  return {
+    biz:{name:"", owner:"", phone:"", email:"", address:"", defaultTrigger:2},
+    templates:{season:DEFAULT_SEASON_TERMS, push:DEFAULT_PUSH_TERMS},
+    termsPage:{trigger:DEFAULT_TERMS_PAGE.trigger, cap:DEFAULT_TERMS_PAGE.cap, salt:DEFAULT_TERMS_PAGE.salt, extra:DEFAULT_TERMS_PAGE.extra},
+    contracts:[], routes:[], runs:[], storms:[]
+  };
+}
+function norm(d){
+  var b = blankState(); if(!d || typeof d!=="object") return b;
+  var out = blankState();
+  if(d.biz && typeof d.biz==="object") for(var k in out.biz) if(d.biz[k]!=null) out.biz[k]=d.biz[k];
+  if(d.templates && typeof d.templates==="object") for(var k2 in out.templates) if(d.templates[k2]!=null) out.templates[k2]=d.templates[k2];
+  if(d.termsPage && typeof d.termsPage==="object") for(var k3 in out.termsPage) if(d.termsPage[k3]!=null) out.termsPage[k3]=d.termsPage[k3];
+  ["contracts","routes","runs","storms"].forEach(function(key){ if(Array.isArray(d[key])) out[key]=d[key]; });
+  out.legal = sanitizeLegal(d.legal);
+  return out;
+}
+function load(){
+  try{ var raw = localStorage.getItem(KEY); if(raw){ var d = JSON.parse(raw); if(d && typeof d==="object") return norm(d); } }catch(e){}
+  return null;
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+function seedDemo(){
+  var s = blankState();
+  s.contracts = [
+    {id:"demo_c1", demo:true, kind:"season", client:"Maple Court HOA", contact:"Dana Whitfield (property manager)", phone:"555-014-2200", email:"manager@maplecourt.example", ptype:"Commercial",
+     property:"Maple Court — main lot, entrances & sidewalks", address:"1200 Maple Ct", stype:"seasonal", start:"2026-11-01", end:"2027-04-15",
+     trigger:2, seasonPrice:4800, pushPrice:0, eventPrice:0, cap:20, overage:240, salt:"included", saltPrice:0,
+     payterms:"Monthly installments during the season", paynote:"3 payments of $1,600 due Nov 1, Dec 1, and Jan 1.", terms:s.templates.season, status:"Signed", notes:"Salt the north entrance first — it ices early."},
+    {id:"demo_c2", demo:true, kind:"perpush", client:"Johnson Residence", contact:"Mark Johnson", phone:"555-014-8811", email:"", ptype:"Residential",
+     property:"Johnson driveway & front walk", address:"48 Elm St", stype:"perpush", start:"", end:"",
+     trigger:2, seasonPrice:0, pushPrice:65, eventPrice:0, cap:"", overage:0, salt:"perapp", saltPrice:20,
+     payterms:"Due at each service visit", paynote:"", terms:s.templates.push, status:"Signed", notes:"Gate code 4417. Pile snow on the left side of the drive."},
+    {id:"demo_c3", demo:true, kind:"season", client:"Riverside Dental", contact:"Office manager", phone:"555-014-3302", email:"office@riversidedental.example", ptype:"Commercial",
+     property:"Riverside Dental — patient lot & entrance walks", address:"915 River Rd", stype:"perevent", start:"2026-11-01", end:"2027-04-15",
+     trigger:3, seasonPrice:0, pushPrice:0, eventPrice:310, cap:"", overage:0, salt:"included", saltPrice:0,
+     payterms:"Net 15 from invoice", paynote:"Invoice after each event.", terms:s.templates.season, status:"Draft", notes:"Must be clear before 7:30 AM patient arrivals."}
+  ];
+  s.routes = [
+    {id:"demo_r1", demo:true, name:"North Route", stops:[
+      {id:"demo_s1", property:"Riverside Dental", address:"915 River Rd", service:"Plow + walks + salt", notes:"Clear before 7:30 AM"},
+      {id:"demo_s2", property:"Maple Court HOA", address:"1200 Maple Ct", service:"Plow + walks + salt", notes:"North entrance ices early"},
+      {id:"demo_s3", property:"Johnson Residence", address:"48 Elm St", service:"Plow + walks", notes:"Gate code 4417"}
+    ]}
+  ];
+  s.runs = [
+    {id:"demo_run1", demo:true, date:"2026-11-14", routeId:"demo_r1", routeName:"North Route", snow:4.5, stopIds:["demo_s1","demo_s2","demo_s3"]}
+  ];
+  s.storms = [
+    {id:"demo_e1", demo:true, date:"2026-11-14", snowfall:4.5, props:3, saltLbs:300, hours:5.5, notes:"First run of the season, all three North Route stops."},
+    {id:"demo_e2", demo:true, date:"2026-11-29", snowfall:6.25, props:3, saltLbs:450, hours:7, notes:"Wet heavy snow; extra salt on the Maple Court north entrance."},
+    {id:"demo_e3", demo:true, date:"2026-12-08", snowfall:2.75, props:2, saltLbs:200, hours:4, notes:"Light event — Riverside below its 3-inch trigger, not serviced."}
+  ];
+  return s;
+}
+
+var S = load();
+if(!S){ S = seedDemo(); save(); }
+
+/* ---------- totals (pure — QA-tested) ---------- */
+function stormTotals(list){
+  var t = {events:0, snow:0, services:0, saltLbs:0, hours:0};
+  (list||[]).forEach(function(e){
+    t.events++; t.snow += clamp0(e.snowfall); t.services += clamp0(e.props); t.saltLbs += clamp0(e.saltLbs); t.hours += clamp0(e.hours);
+  });
+  t.snow = Math.round(t.snow*100)/100;
+  t.saltTons = Math.round((t.saltLbs/2000)*100)/100;
+  t.avgSnow = t.events ? Math.round((t.snow/t.events)*100)/100 : 0;
+  return t;
+}
+function runTotals(list){
+  var t = {runs:0, stopsServiced:0};
+  (list||[]).forEach(function(r){ t.runs++; t.stopsServiced += (r.stopIds||[]).length; });
+  return t;
+}
+function contractPriceLabel(c){
+  if(c.stype==="seasonal") return fmtMoney(c.seasonPrice) + " / season";
+  if(c.stype==="perevent") return fmtMoney(c.eventPrice) + " / event";
+  return fmtMoney(c.pushPrice) + " / push";
+}
+function saltLabel(c){
+  if(c.salt==="included") return "Included in price";
+  if(c.salt==="perapp") return fmtMoney(c.saltPrice) + " per application";
+  return "Not included";
+}
+
+/* ---------- navigation ---------- */
+function showTab(name){
+  var btns = document.querySelectorAll("#topnav button");
+  for(var i=0;i<btns.length;i++){ btns[i].classList.toggle("active", btns[i].getAttribute("data-tab")===name); }
+  var secs = document.querySelectorAll("section.tab");
+  for(var j=0;j<secs.length;j++){ secs[j].classList.toggle("active", secs[j].id==="tab-"+name); }
+  if(name==="overview") renderOverview();
+  if(name==="contracts") renderContracts();
+  if(name==="routes") renderRoutes();
+  if(name==="storms") renderStorms();
+  if(name==="terms") renderTermsPage();
+  if(name==="settings") renderSettings();
+}
+
+/* ---------- overview ---------- */
+function renderOverview(){
+  var t = stormTotals(S.storms), rt = runTotals(S.runs);
+  var signed = S.contracts.filter(function(c){return c.status==="Signed"||c.status==="Active";}).length;
+  el("ovStats").innerHTML =
+    '<span class="stat">Storm events<b>'+t.events+'</b></span>' +
+    '<span class="stat">Total snowfall<b>'+fmtNum(t.snow)+' in</b></span>' +
+    '<span class="stat">Property services<b>'+t.services+'</b></span>' +
+    '<span class="stat">Salt used<b>'+fmtNum(t.saltLbs)+' lb ('+fmtNum(t.saltTons)+' tons)</b></span>' +
+    '<span class="stat">Route runs logged<b>'+rt.runs+' ('+rt.stopsServiced+' stops)</b></span>' +
+    '<span class="stat">Signed / active contracts<b>'+signed+' of '+S.contracts.length+'</b></span>';
+  if(!S.contracts.length){ el("ovContracts").innerHTML = '<p class="hint">No contracts yet — add your first one in the Contracts tab. A signed demo set is included so you can see the paperwork before you type anything.</p>'; }
+  else{
+    el("ovContracts").innerHTML = S.contracts.map(function(c){
+      return '<div class="item"><span class="t">'+esc(c.client)+'</span> <span class="chip">'+(c.kind==="perpush"?"Per-Push Agreement":"Season Contract")+'</span><span class="chip">'+esc(c.status)+'</span><br>' +
+      '<span class="muted">'+esc(c.property||c.address)+' — '+contractPriceLabel(c)+' · trigger '+fmtNum(c.trigger)+' in · salt: '+esc(saltLabel(c))+'</span></div>';
+    }).join("");
+  }
+  if(!S.routes.length){ el("ovRoutes").innerHTML = '<p class="hint">No routes yet — build one in the Routes tab.</p>'; }
+  else{
+    el("ovRoutes").innerHTML = S.routes.map(function(r){
+      var runs = S.runs.filter(function(x){return x.routeId===r.id;}).length;
+      return '<div class="item"><span class="t">'+esc(r.name)+'</span><br><span class="muted">'+(r.stops||[]).length+' stops · '+runs+' run'+(runs===1?"":"s")+' logged</span></div>';
+    }).join("");
+  }
+  el("hdrCo").textContent = S.biz.name ? (S.biz.name + (S.biz.phone ? " · " + S.biz.phone : "")) : "";
+}
+
+/* ---------- contracts ---------- */
+var editingContractId = null;
+function kindChanged(){
+  var kind = val("c_kind");
+  el("cSeasonFields").classList.toggle("hidden", kind==="perpush");
+  if(kind==="perpush"){
+    setVal("c_stype","perpush");
+    if(!editingContractId) setVal("c_terms", S.templates.push);
+  } else {
+    if(!editingContractId && (val("c_terms")===S.templates.push)) setVal("c_terms", S.templates.season);
+  }
+}
+function resetContractForm(){
+  editingContractId = null;
+  el("cFormTitle").textContent = "New contract / agreement";
+  ["c_client","c_contact","c_phone","c_email","c_property","c_address","c_seasonprice","c_cap","c_overage","c_pushprice","c_eventprice","c_saltprice","c_paynote","c_notes"].forEach(function(id){ setVal(id,""); });
+  setVal("c_kind","season"); setVal("c_ptype","Residential"); setVal("c_stype","seasonal");
+  setVal("c_trigger", S.biz.defaultTrigger || 2); setVal("c_salt","included");
+  setVal("c_payterms","Due in full at signing"); setVal("c_status","Draft");
+  setVal("c_start",""); setVal("c_end","");
+  setVal("c_terms", S.templates.season);
+  el("cSeasonFields").classList.remove("hidden");
+  msg("c_msg","");
+}
+function readContractForm(){
+  var kind = val("c_kind");
+  var c = {
+    kind: kind,
+    client: val("c_client").trim(), contact: val("c_contact").trim(), phone: val("c_phone").trim(), email: val("c_email").trim(),
+    ptype: val("c_ptype"), property: val("c_property").trim(), address: val("c_address").trim(),
+    stype: kind==="perpush" ? "perpush" : val("c_stype"),
+    start: val("c_start"), end: val("c_end"),
+    trigger: clamp0(val("c_trigger")),
+    seasonPrice: clamp0(val("c_seasonprice")), pushPrice: clamp0(val("c_pushprice")), eventPrice: clamp0(val("c_eventprice")),
+    cap: val("c_cap")==="" ? "" : clamp0(val("c_cap")), overage: clamp0(val("c_overage")),
+    salt: val("c_salt"), saltPrice: clamp0(val("c_saltprice")),
+    payterms: val("c_payterms"), paynote: val("c_paynote").trim(),
+    terms: val("c_terms"), status: val("c_status"), notes: val("c_notes").trim()
+  };
+  return c;
+}
+function saveContract(){
+  var c = readContractForm();
+  if(!c.client){ msg("c_msg","Client name is required."); return false; }
+  if(!c.address){ msg("c_msg","Property address is required."); return false; }
+  if(editingContractId){
+    for(var i=0;i<S.contracts.length;i++){
+      if(S.contracts[i].id===editingContractId){
+        var keepDemo = S.contracts[i].demo; var keepId = S.contracts[i].id;
+        S.contracts[i] = c; S.contracts[i].id = keepId; if(keepDemo) S.contracts[i].demo = true;
+      }
+    }
+    msg("c_msg","Contract updated.", true);
+  } else {
+    c.id = uid("c"); S.contracts.push(c);
+    msg("c_msg","Contract saved. Use Print on the saved contract to produce the signing copy.", true);
+  }
+  save(); renderContracts(); resetContractForm(); renderOverview();
+  return true;
+}
+function editContract(id){
+  var c = null; S.contracts.forEach(function(x){ if(x.id===id) c=x; });
+  if(!c) return;
+  editingContractId = id;
+  el("cFormTitle").textContent = "Edit contract — " + c.client;
+  setVal("c_kind", c.kind); setVal("c_client", c.client); setVal("c_contact", c.contact); setVal("c_phone", c.phone);
+  setVal("c_email", c.email); setVal("c_ptype", c.ptype); setVal("c_property", c.property); setVal("c_address", c.address);
+  setVal("c_stype", c.stype); setVal("c_start", c.start); setVal("c_end", c.end); setVal("c_trigger", c.trigger);
+  setVal("c_seasonprice", c.seasonPrice||""); setVal("c_cap", c.cap); setVal("c_overage", c.overage||"");
+  setVal("c_pushprice", c.pushPrice||""); setVal("c_eventprice", c.eventPrice||"");
+  setVal("c_salt", c.salt); setVal("c_saltprice", c.saltPrice||"");
+  setVal("c_payterms", c.payterms); setVal("c_paynote", c.paynote); setVal("c_terms", c.terms);
+  setVal("c_status", c.status); setVal("c_notes", c.notes);
+  el("cSeasonFields").classList.toggle("hidden", c.kind==="perpush");
+  showTab("contracts");
+  window.scrollTo(0,0);
+}
+function deleteContract(id){
+  if(!window.confirm("Delete this contract? This cannot be undone.")) return;
+  S.contracts = S.contracts.filter(function(x){ return x.id!==id; });
+  if(editingContractId===id) resetContractForm();
+  save(); renderContracts(); renderOverview();
+}
+function renderContracts(){
+  var box = el("contractList");
+  if(!S.contracts.length){ box.innerHTML = '<p class="hint">No saved contracts yet.</p>'; return; }
+  box.innerHTML = S.contracts.map(function(c){
+    return '<div class="item"><span class="t">'+esc(c.client)+'</span> ' +
+      '<span class="chip">'+(c.kind==="perpush"?"Per-Push Agreement":"Season Contract")+'</span><span class="chip">'+esc(c.ptype)+'</span><span class="chip">'+esc(c.status)+'</span>' +
+      (c.demo?' <span class="chip">DEMO</span>':"") + '<br>' +
+      '<span class="muted">'+esc(c.property||"")+(c.property?" — ":"")+esc(c.address)+' · '+contractPriceLabel(c)+' · trigger '+fmtNum(c.trigger)+' in' +
+      (c.stype==="seasonal" && c.cap!=="" ? ' · cap '+fmtNum(c.cap)+' visits, overage '+fmtMoney(c.overage) : "") +
+      ' · salt: '+esc(saltLabel(c))+'</span>' +
+      '<div class="btnrow"><button class="btn small" data-act="print" data-id="'+c.id+'">Print / PDF</button>' +
+      '<button class="btn small ghost" data-act="edit" data-id="'+c.id+'">Edit</button>' +
+      '<button class="btn small danger" data-act="del" data-id="'+c.id+'">Delete</button></div></div>';
+  }).join("");
+  var btns = box.querySelectorAll("button[data-act]");
+  for(var i=0;i<btns.length;i++){
+    btns[i].addEventListener("click", function(){
+      var id = this.getAttribute("data-id"), act = this.getAttribute("data-act");
+      if(act==="print") printContract(id);
+      if(act==="edit") editContract(id);
+      if(act==="del") deleteContract(id);
+    });
+  }
+}
+
+/* ---------- print builders (pure string builders — QA-tested) ---------- */
+function bizHeadHTML(){
+  var b = S.biz;
+  var name = b.name || "[Your Business Name]";
+  var line2 = [b.owner, b.address].filter(Boolean).join(" · ");
+  var line3 = [b.phone, b.email].filter(Boolean).join(" · ");
+  return '<div class="ps-head"><div class="ps-co">'+esc(name)+'</div>' +
+    (line2?'<div>'+esc(line2)+'</div>':"") + (line3?'<div>'+esc(line3)+'</div>':"") + '</div>';
+}
+function buildContractPrint(c){
+  var b = S.biz;
+  var isShort = c.kind==="perpush";
+  var h = bizHeadHTML();
+  h += '<div class="ps-title">'+(isShort ? "Per-Push Snow Removal Agreement (Short Form)" : "Snow &amp; Ice Management Service Agreement")+'</div>';
+  h += '<table class="ps-table">' +
+    '<tr><th>Service provider</th><td>'+esc(b.name||"[Your Business Name]")+(b.owner?" — "+esc(b.owner):"")+(b.phone?" · "+esc(b.phone):"")+'</td></tr>' +
+    '<tr><th>Client</th><td>'+esc(c.client)+(c.contact?" — Attn: "+esc(c.contact):"")+(c.phone?" · "+esc(c.phone):"")+(c.email?" · "+esc(c.email):"")+'</td></tr>' +
+    '<tr><th>Property</th><td>'+esc(c.property||"")+(c.property?"<br>":"")+esc(c.address)+' ('+esc(c.ptype)+')</td></tr>' +
+    '<tr><th>Service type</th><td>'+(c.stype==="seasonal"?"Seasonal flat rate":c.stype==="perevent"?"Per-event":"Per-push")+'</td></tr>' +
+    '<tr><th>Trigger depth</th><td>'+fmtNum(c.trigger)+' inches of accumulation, measured at the property</td></tr>';
+  if(!isShort && c.stype==="seasonal"){
+    h += '<tr><th>Season</th><td>'+fmtDate(c.start)+' through '+fmtDate(c.end)+'</td></tr>' +
+         '<tr><th>Season price</th><td>'+fmtMoney(c.seasonPrice)+'</td></tr>';
+    if(c.cap!=="") h += '<tr><th>Visit cap</th><td>'+fmtNum(c.cap)+' visits included; additional visits at '+fmtMoney(c.overage)+' per visit</td></tr>';
+    else h += '<tr><th>Visit cap</th><td>No cap — unlimited visits at the trigger depth</td></tr>';
+  }
+  if(c.stype==="perpush") h += '<tr><th>Price</th><td>'+fmtMoney(c.pushPrice)+' per push / visit</td></tr>';
+  if(c.stype==="perevent") h += '<tr><th>Price</th><td>'+fmtMoney(c.eventPrice)+' per event</td></tr>';
+  h += '<tr><th>Salting / de-icing</th><td>'+esc(saltLabel(c))+'</td></tr>' +
+       '<tr><th>Payment terms</th><td>'+esc(c.payterms)+(c.paynote?"<br>"+esc(c.paynote):"")+'</td></tr></table>';
+  h += '<div class="ps-terms">'+esc(c.terms||"")+'</div>';
+  h += '<div class="ps-sig">' +
+    '<div><div class="ps-sigline">Service provider — signature &amp; date</div><div class="ps-sigline">Print name</div></div>' +
+    '<div><div class="ps-sigline">Client — signature &amp; date</div><div class="ps-sigline">Print name</div></div></div>';
+  h += '<div class="ps-small">This document was prepared from sample template language in the SnowBid Contract &amp; Route Pack. It is not legal advice. Both parties should have the terms reviewed by a local attorney before relying on them, and the provider should confirm the terms match its insurance coverage.</div>';
+  return h;
+}
+function printContract(id){
+  var c = null; S.contracts.forEach(function(x){ if(x.id===id) c=x; });
+  if(!c) return;
+  el("printsheet").innerHTML = buildContractPrint(c);
+  window.print();
+}
+function buildRoutePrint(r){
+  var h = bizHeadHTML();
+  h += '<div class="ps-title">Route Sheet — '+esc(r.name)+'</div>';
+  h += '<div>Date: ____________ &nbsp; Driver: ____________ &nbsp; Snowfall: ________ in &nbsp; Truck / machine: ____________</div>';
+  (r.stops||[]).forEach(function(st, i){
+    h += '<div class="ps-stop"><b>'+(i+1)+'. <span class="ps-box"></span>'+esc(st.property)+'</b> — '+esc(st.address)+'<br>' +
+      'Service: '+esc(st.service)+(st.notes?' · Notes: '+esc(st.notes):"")+'<br>' +
+      '<span style="font-size:12px;color:#333">Arrival: ________ &nbsp; Depth: ________ in &nbsp; Salt: ________ lb &nbsp; Done ☐ &nbsp; Skipped ☐ (reason: ________________)</span></div>';
+  });
+  h += '<div class="ps-small">Route sheet from the SnowBid Contract &amp; Route Pack. Log the completed run in the app when you return so season totals stay current.</div>';
+  return h;
+}
+function printRoute(id){
+  var r = null; S.routes.forEach(function(x){ if(x.id===id) r=x; });
+  if(!r) return;
+  el("printsheet").innerHTML = buildRoutePrint(r);
+  window.print();
+}
+function buildTermsPrint(){
+  var tp = S.termsPage;
+  var h = bizHeadHTML();
+  h += '<div class="ps-title">How Your Snow Service Works</div>';
+  h += '<div class="ps-terms">'+esc(tp.trigger)+'</div>';
+  h += '<div class="ps-terms">'+esc(tp.cap)+'</div>';
+  h += '<div class="ps-terms">'+esc(tp.salt)+'</div>';
+  if(tp.extra) h += '<div class="ps-terms">'+esc(tp.extra)+'</div>';
+  return h;
+}
+function buildTermsText(){
+  var b = S.biz, tp = S.termsPage;
+  var lines = [];
+  lines.push((b.name || "Your snow service") + " — HOW YOUR SNOW SERVICE WORKS");
+  lines.push("");
+  lines.push(tp.trigger); lines.push("");
+  lines.push(tp.cap); lines.push("");
+  lines.push(tp.salt);
+  if(tp.extra){ lines.push(""); lines.push(tp.extra); }
+  if(b.phone) { lines.push(""); lines.push("Questions? Call or text " + b.phone + "."); }
+  return lines.join("\n");
+}
+
+/* ---------- routes ---------- */
+function addRoute(){
+  var name = val("r_name").trim();
+  if(!name){ msg("r_msg","Give the route a name first."); return false; }
+  S.routes.push({id:uid("r"), name:name, stops:[]});
+  setVal("r_name",""); save(); renderRoutes(); renderOverview();
+  msg("r_msg","Route added — now add its stops below.", true);
+  return true;
+}
+function deleteRoute(id){
+  if(!window.confirm("Delete this route and its stops? Run history entries keep the route name.")) return;
+  S.routes = S.routes.filter(function(x){ return x.id!==id; });
+  save(); renderRoutes(); renderOverview();
+}
+function addStop(routeId){
+  var prop = val("st_prop_"+routeId).trim();
+  if(!prop){ window.alert("Enter a property name for the stop."); return false; }
+  var r = null; S.routes.forEach(function(x){ if(x.id===routeId) r=x; });
+  if(!r) return false;
+  r.stops = r.stops || [];
+  r.stops.push({id:uid("s"), property:prop, address:val("st_addr_"+routeId).trim(), service:val("st_svc_"+routeId), notes:val("st_notes_"+routeId).trim()});
+  save(); renderRoutes(); renderOverview();
+  return true;
+}
+function moveStop(routeId, idx, dir){
+  var r = null; S.routes.forEach(function(x){ if(x.id===routeId) r=x; });
+  if(!r) return;
+  var j = idx + dir; if(j<0 || j>=r.stops.length) return;
+  var tmp = r.stops[idx]; r.stops[idx] = r.stops[j]; r.stops[j] = tmp;
+  save(); renderRoutes();
+}
+function deleteStop(routeId, stopId){
+  var r = null; S.routes.forEach(function(x){ if(x.id===routeId) r=x; });
+  if(!r) return;
+  var st = null; (r.stops||[]).forEach(function(x){ if(x.id===stopId) st=x; });
+  if(!window.confirm("Remove stop \""+(st?st.property:stopId)+"\" from route \""+r.name+"\"? This cannot be undone.")) return;
+  r.stops = r.stops.filter(function(x){ return x.id!==stopId; });
+  save(); renderRoutes(); renderOverview();
+}
+function renderRoutes(){
+  var box = el("routeList");
+  if(!S.routes.length){ box.innerHTML = '<div class="card"><p class="hint">No routes yet — add one above.</p></div>'; }
+  else{
+    box.innerHTML = S.routes.map(function(r){
+      var stopsHtml = (r.stops||[]).map(function(st, i){
+        return '<tr><td class="num">'+(i+1)+'</td><td><b>'+esc(st.property)+'</b><br><span class="muted">'+esc(st.address)+'</span></td>' +
+          '<td>'+esc(st.service)+(st.notes?'<br><span class="muted">'+esc(st.notes)+'</span>':"")+'</td>' +
+          '<td class="right"><button class="btn small ghost" data-rmove="-1" data-r="'+r.id+'" data-i="'+i+'">↑</button> ' +
+          '<button class="btn small ghost" data-rmove="1" data-r="'+r.id+'" data-i="'+i+'">↓</button> ' +
+          '<button class="btn small danger" data-rdel="'+st.id+'" data-r="'+r.id+'">✕</button></td></tr>';
+      }).join("");
+      return '<div class="card"><h2>'+esc(r.name)+(r.demo?' <span class="chip">DEMO</span>':"")+'</h2>' +
+        '<table><tr><th class="num">#</th><th>Property</th><th>Service</th><th></th></tr>'+(stopsHtml || '<tr><td colspan="4" class="muted">No stops yet — add the first one below.</td></tr>')+'</table>' +
+        '<h3>Add a stop</h3><div class="grid">' +
+        '<div><label>Property *</label><input id="st_prop_'+r.id+'" placeholder="Riverside Dental"></div>' +
+        '<div><label>Address</label><input id="st_addr_'+r.id+'" placeholder="915 River Rd"></div></div>' +
+        '<div class="grid"><div><label>Service</label><select id="st_svc_'+r.id+'"><option>Plow only</option><option>Plow + walks</option><option>Plow + salt</option><option>Plow + walks + salt</option></select></div>' +
+        '<div><label>Notes</label><input id="st_notes_'+r.id+'" placeholder="Clear before 7:30 AM"></div></div>' +
+        '<div class="btnrow"><button class="btn small" data-radd="'+r.id+'">Add stop</button>' +
+        '<button class="btn small ghost" data-rprint="'+r.id+'">Print route sheet</button>' +
+        '<button class="btn small danger" data-rdelete="'+r.id+'">Delete route</button></div></div>';
+    }).join("");
+  }
+  // wire route card buttons
+  var all = box.querySelectorAll("button");
+  for(var i=0;i<all.length;i++){
+    all[i].addEventListener("click", function(){
+      if(this.getAttribute("data-radd")) addStop(this.getAttribute("data-radd"));
+      else if(this.getAttribute("data-rprint")) printRoute(this.getAttribute("data-rprint"));
+      else if(this.getAttribute("data-rdelete")) deleteRoute(this.getAttribute("data-rdelete"));
+      else if(this.getAttribute("data-rmove")) moveStop(this.getAttribute("data-r"), parseInt(this.getAttribute("data-i"),10), parseInt(this.getAttribute("data-rmove"),10));
+      else if(this.getAttribute("data-rdel")) deleteStop(this.getAttribute("data-r"), this.getAttribute("data-rdel"));
+    });
+  }
+  // run-log route picker + stop checkboxes
+  var sel = el("run_route");
+  var cur = sel.value;
+  sel.innerHTML = S.routes.map(function(r){ return '<option value="'+r.id+'">'+esc(r.name)+'</option>'; }).join("");
+  if(cur) sel.value = cur;
+  renderRunStops();
+}
+function renderRunStops(){
+  var rid = val("run_route");
+  var r = null; S.routes.forEach(function(x){ if(x.id===rid) r=x; });
+  var box = el("run_stops");
+  if(!r || !(r.stops||[]).length){ box.innerHTML = '<p class="hint">Pick a route with stops to log a run.</p>'; return; }
+  box.innerHTML = r.stops.map(function(st){
+    return '<div class="check"><input type="checkbox" id="run_chk_'+st.id+'" checked><label for="run_chk_'+st.id+'">'+esc(st.property)+' — '+esc(st.address)+'</label></div>';
+  }).join("");
+}
+function saveRun(){
+  var rid = val("run_route");
+  var r = null; S.routes.forEach(function(x){ if(x.id===rid) r=x; });
+  if(!r){ msg("run_msg","Add a route first."); return false; }
+  var date = val("run_date");
+  if(!date){ msg("run_msg","Pick the run date."); return false; }
+  var stopIds = [];
+  (r.stops||[]).forEach(function(st){ var cb = el("run_chk_"+st.id); if(cb && cb.checked) stopIds.push(st.id); });
+  S.runs.push({id:uid("run"), date:date, routeId:r.id, routeName:r.name, snow:clamp0(val("run_snow")), stopIds:stopIds});
+  save(); renderRunHistory(); renderOverview();
+  msg("run_msg","Run saved — "+stopIds.length+" stop"+(stopIds.length===1?"":"s")+" serviced on "+esc(r.name)+".", true);
+  return true;
+}
+function deleteRun(id){
+  var rn = null; S.runs.forEach(function(x){ if(x.id===id) rn=x; });
+  if(!window.confirm("Delete the run on "+(rn?fmtDate(rn.date):"this date")+" ("+(rn?rn.routeName:"")+")? This cannot be undone.")) return;
+  S.runs = S.runs.filter(function(x){ return x.id!==id; });
+  save(); renderRunHistory(); renderOverview();
+}
+function renderRunHistory(){
+  var box = el("runHistory");
+  var rt = runTotals(S.runs);
+  if(!S.runs.length){ box.innerHTML = '<p class="hint">No runs logged yet. Totals so far: 0 runs, 0 stops serviced.</p>'; return; }
+  var sorted = S.runs.slice().sort(function(a,b){ return a.date<b.date?1:-1; });
+  box.innerHTML = '<p class="hint">Total: <b>'+rt.runs+' runs</b>, <b>'+rt.stopsServiced+' stops serviced</b>.</p>' + sorted.map(function(r){
+    return '<div class="item"><span class="t">'+esc(fmtDate(r.date))+' — '+esc(r.routeName)+'</span>'+(r.demo?' <span class="chip">DEMO</span>':"")+'<br>' +
+      '<span class="muted">'+(r.stopIds||[]).length+' stops serviced'+(num(r.snow)?' · '+fmtNum(r.snow)+' in snowfall':"")+'</span>' +
+      '<div class="btnrow"><button class="btn small danger" data-rundel="'+r.id+'">Delete</button></div></div>';
+  }).join("");
+  var btns = box.querySelectorAll("button[data-rundel]");
+  for(var i=0;i<btns.length;i++) btns[i].addEventListener("click", function(){ deleteRun(this.getAttribute("data-rundel")); });
+}
+
+/* ---------- storm log ---------- */
+function saveStorm(){
+  var date = val("s_date");
+  if(!date){ msg("s_msg","Pick the storm date."); return false; }
+  if(val("s_snow")===""){ msg("s_msg","Enter the snowfall amount (0 is fine for an ice-only event)."); return false; }
+  S.storms.push({id:uid("e"), date:date, snowfall:clamp0(val("s_snow")), props:clamp0(val("s_props")), saltLbs:clamp0(val("s_salt")), hours:clamp0(val("s_hours")), notes:val("s_notes").trim()});
+  ["s_snow","s_props","s_salt","s_hours","s_notes"].forEach(function(id){ setVal(id,""); });
+  save(); renderStorms(); renderOverview();
+  msg("s_msg","Storm event saved.", true);
+  return true;
+}
+function deleteStorm(id){
+  var se = null; S.storms.forEach(function(x){ if(x.id===id) se=x; });
+  if(!window.confirm("Delete the storm event on "+(se?fmtDate(se.date):"this date")+"? This cannot be undone.")) return;
+  S.storms = S.storms.filter(function(x){ return x.id!==id; });
+  save(); renderStorms(); renderOverview();
+}
+function renderStorms(){
+  var t = stormTotals(S.storms);
+  el("stormTotals").innerHTML =
+    '<span class="stat">Events<b>'+t.events+'</b></span>' +
+    '<span class="stat">Total snowfall<b>'+fmtNum(t.snow)+' in</b></span>' +
+    '<span class="stat">Avg per event<b>'+fmtNum(t.avgSnow)+' in</b></span>' +
+    '<span class="stat">Property services<b>'+t.services+'</b></span>' +
+    '<span class="stat">Salt used<b>'+fmtNum(t.saltLbs)+' lb ('+fmtNum(t.saltTons)+' tons)</b></span>' +
+    '<span class="stat">Crew hours<b>'+fmtNum(t.hours)+'</b></span>';
+  var box = el("stormList");
+  if(!S.storms.length){ box.innerHTML = '<p class="hint">No storm events logged yet.</p>'; return; }
+  var sorted = S.storms.slice().sort(function(a,b){ return a.date<b.date?1:-1; });
+  box.innerHTML = '<table><tr><th>Date</th><th class="num">Snowfall</th><th class="num">Properties</th><th class="num">Salt (lb)</th><th>Notes</th><th></th></tr>' +
+    sorted.map(function(e){
+      return '<tr><td>'+esc(fmtDate(e.date))+(e.demo?' <span class="chip">DEMO</span>':"")+'</td><td class="num">'+fmtNum(e.snowfall)+' in</td><td class="num">'+fmtNum(e.props)+'</td><td class="num">'+fmtNum(e.saltLbs)+'</td><td>'+esc(e.notes||"")+'</td>' +
+      '<td class="right"><button class="btn small danger" data-sdel="'+e.id+'">✕</button></td></tr>';
+    }).join("") + '</table>';
+  var btns = box.querySelectorAll("button[data-sdel]");
+  for(var i=0;i<btns.length;i++) btns[i].addEventListener("click", function(){ deleteStorm(this.getAttribute("data-sdel")); });
+}
+
+/* ---------- client terms page ---------- */
+function renderTermsPage(){
+  setVal("t_trigger", S.termsPage.trigger); setVal("t_cap", S.termsPage.cap);
+  setVal("t_salt", S.termsPage.salt); setVal("t_extra", S.termsPage.extra);
+}
+function saveTermsPage(){
+  S.termsPage = {trigger:val("t_trigger"), cap:val("t_cap"), salt:val("t_salt"), extra:val("t_extra")};
+  save(); msg("t_msg","Wording saved.", true);
+  return true;
+}
+
+/* ---------- settings / backup ---------- */
+function renderSettings(){
+  setVal("b_name", S.biz.name); setVal("b_owner", S.biz.owner); setVal("b_phone", S.biz.phone);
+  setVal("b_email", S.biz.email); setVal("b_address", S.biz.address); setVal("b_trigger", S.biz.defaultTrigger);
+  setVal("d_seasonterms", S.templates.season); setVal("d_pushterms", S.templates.push);
+}
+function saveBiz(){
+  S.biz = {name:val("b_name").trim(), owner:val("b_owner").trim(), phone:val("b_phone").trim(), email:val("b_email").trim(), address:val("b_address").trim(), defaultTrigger:clamp0(val("b_trigger")) || 2};
+  save(); renderOverview(); msg("b_msg","Business info saved — it now prints on every document.", true);
+  return true;
+}
+function saveTemplates(){
+  S.templates = {season:val("d_seasonterms"), push:val("d_pushterms")};
+  save(); msg("d_msg","Templates saved — new contracts will start from this wording.", true);
+  return true;
+}
+function exportData(){
+  return JSON.stringify(S, null, 2);
+}
+function downloadBackup(){
+  try{
+    var blob = new Blob([exportData()], {type:"application/json"});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "snowbid-contract-pack-backup.json";
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ try{ URL.revokeObjectURL(a.href); }catch(e){} }, 500);
+    msg("x_msg","Backup downloaded.", true);
+  }catch(e){ msg("x_msg","Download was blocked — copy the backup from the paste box instead: use Import after pasting into a fresh copy."); setVal("x_text", exportData()); }
+}
+function parseBackup(text){
+  try{
+    var d = JSON.parse(text);
+    if(!d || typeof d!=="object" || Array.isArray(d)) return null;
+    if(!("contracts" in d) && !("routes" in d) && !("storms" in d) && !("biz" in d)) return null;
+    return norm(d);
+  }catch(e){ return null; }
+}
+function importFromText(text){
+  var d = parseBackup(text);
+  if(!d){ msg("x_msg","That backup could not be read — check it is the full JSON from an export. Nothing was changed."); return false; }
+  S = d; save();
+  renderAll();
+  msg("x_msg","Backup imported — all data replaced with the backup.", true);
+  return true;
+}
+function clearDemo(){
+  var before = S.contracts.length + S.routes.length + S.runs.length + S.storms.length;
+  S.contracts = S.contracts.filter(function(x){ return !x.demo; });
+  S.routes = S.routes.filter(function(x){ return !x.demo; });
+  S.runs = S.runs.filter(function(x){ return !x.demo; });
+  S.storms = S.storms.filter(function(x){ return !x.demo; });
+  var after = S.contracts.length + S.routes.length + S.runs.length + S.storms.length;
+  save(); renderAll();
+  msg("x_msg","Demo data cleared ("+(before-after)+" records removed). Your own records were kept.", true);
+  return before-after;
+}
+function eraseAll(){
+  if(!window.confirm("Erase ALL data in this pack (contracts, routes, runs, storms, settings)? This cannot be undone.")) return false;
+  S = blankState(); save(); renderAll(); resetContractForm();
+  msg("x_msg","All data erased. The pack is empty and ready for your real season.", true);
+  return true;
+}
+
+/* ---------- init ---------- */
+function renderAll(){
+  renderOverview(); renderContracts(); renderRoutes(); renderRunHistory(); renderStorms(); renderTermsPage(); renderSettings();
+}
+function init(){
+  var navBtns = document.querySelectorAll("#topnav button");
+  for(var i=0;i<navBtns.length;i++){
+    navBtns[i].addEventListener("click", function(){ showTab(this.getAttribute("data-tab")); });
+  }
+  el("c_kind").addEventListener("change", kindChanged);
+  el("c_save").addEventListener("click", saveContract);
+  el("c_reset").addEventListener("click", resetContractForm);
+  el("r_add").addEventListener("click", addRoute);
+  el("run_route").addEventListener("change", renderRunStops);
+  el("run_save").addEventListener("click", saveRun);
+  el("s_save").addEventListener("click", saveStorm);
+  el("t_save").addEventListener("click", saveTermsPage);
+  el("t_print").addEventListener("click", function(){ el("printsheet").innerHTML = buildTermsPrint(); window.print(); });
+  el("t_copy").addEventListener("click", function(){ el("t_textwrap").classList.remove("hidden"); setVal("t_text", buildTermsText()); });
+  el("b_save").addEventListener("click", saveBiz);
+  el("d_save").addEventListener("click", saveTemplates);
+  el("d_restore").addEventListener("click", function(){ setVal("d_seasonterms", DEFAULT_SEASON_TERMS); setVal("d_pushterms", DEFAULT_PUSH_TERMS); saveTemplates(); });
+  el("x_export").addEventListener("click", downloadBackup);
+  el("x_clearDemo").addEventListener("click", clearDemo);
+  el("x_erase").addEventListener("click", eraseAll);
+  el("x_importText").addEventListener("click", function(){ importFromText(val("x_text")); });
+  el("x_file").addEventListener("change", function(){
+    var f = this.files && this.files[0]; if(!f) return;
+    var reader = new FileReader();
+    reader.onload = function(){ importFromText(String(reader.result||"")); };
+    reader.onerror = function(){ msg("x_msg","That file could not be read. Nothing was changed."); };
+    reader.readAsText(f);
+  });
+  resetContractForm();
+  var today = new Date();
+  var iso = today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
+  setVal("run_date", iso); setVal("s_date", iso);
+  renderAll();
+}
+init();
+
+/* ================= Legal — Terms of Use acceptance (catalog pattern v1.0) ================= */
+var TERMS_VERSION = "1.0";
+var LEGAL_APP_NAME = "SnowBid Contract Pack";
+var LEGAL_HAS_DISCLAIMER = true;
+var LEGAL_TERMS_HTML = "<h3>Terms of Use \u2014 White Wolf Digital Apps</h3><p><b>Version 1.0 (DRAFT \u2014 pending attorney review)</b></p><p><b>Seller: White Wolf Tree Service LLC, selling digital products under the name \"White Wolf Digital\"</b></p><p><b>Contact: whitewolfoklahoma@gmail.com</b></p><h4>1. What you're buying</h4><p>Our apps (including ForgeFit AI, ForgeKitchen, TreeBid Pro, SnowBid,</p><p>WashPrice Pro, RoofSquares, JobProfit Tracker, PastureLedger, and the other</p><p>titles sold under White Wolf Digital) are single-file software tools. When</p><p>you buy one, you are buying a <b>license to use the file</b>, not ownership of</p><p>the software itself.</p><h4>2. Your license</h4><ul><li>You may use the app for your own personal or business work.</li><li>You may open it on your own devices (phone, tablet, computer) and move your</li></ul><p>  own data between them using the app's built-in backup/export tools.</p><ul><li>You may <b>not</b> resell, redistribute, give away, upload, or share the app</li></ul><p>  file (or a copy of it) with anyone else \u2014 including posting it online,</p><p>  bundling it with other products, or selling access to it.</p><ul><li>You may <b>not</b> claim the app as your own work, remove its branding or</li></ul><p>  notices, or use it to build a competing product for resale.</p><ul><li>One purchase = one buyer. A business purchase covers the buyer and their</li></ul><p>  own employees using it for that business's work; it does not cover other</p><p>  businesses.</p><h4>3. Your data stays yours \u2014 and stays on your device</h4><ul><li>The current versions of our apps run <b>entirely on your device</b>. They have</li></ul><p>  no accounts, no sign-in, no analytics, and they collect, transmit, and store</p><p>  <b>none</b> of your information on any server. We never see your data.</p><ul><li>Your records are stored in your browser/app storage on your device. **You</li></ul><p>  are responsible for backing them up** using the app's export tools. If you</p><p>  clear your browser data, lose your device, or uninstall the app, your</p><p>  records may be permanently lost, and we cannot recover them \u2014 we never had</p><p>  a copy.</p><ul><li>Files you export (backups, quotes, PDFs) are under your control. Where you</li></ul><p>  store or send them is up to you.</p><h4>4. Estimates are tools, not guarantees</h4><p>Every number our apps produce \u2014 bids, prices, costs, calorie targets,</p><p>projections, schedules, totals \u2014 is an **estimate generated from the</p><p>information you enter and the settings you choose**. Outputs are aids for</p><p>your own judgment, not guarantees of price, profit, outcome, or result. You</p><p>are responsible for checking any output before relying on it (see also the</p><p>disclaimer that applies to your app: Health Disclaimer for fitness/nutrition</p><p>apps, Estimator Disclaimer for contractor tools). If an input is wrong, the</p><p>output will be wrong.</p><h4>5. Acceptable use</h4><p>Don't use the apps to break the law, infringe anyone's rights, or</p><p>misrepresent quotes, invoices, or records to your own customers. For the</p><p>fitness apps, the guardrails in the app (healthy-rate limits, calorie floor)</p><p>are part of the product \u2014 don't treat the app as a way around them.</p><h4>6. Provided \"as is\"</h4><p>The apps are provided **\"as is\" and \"as available,\" without warranties of</p><p>any kind**, express or implied \u2014 including merchantability, fitness for a</p><p>particular purpose, accuracy of calculations, and uninterrupted or</p><p>error-free operation \u2014 to the maximum extent allowed by law. Software has</p><p>bugs; browsers change; we work to fix problems but do not promise any app is</p><p>error-free or will work on every device or browser forever.</p><h4>7. Limitation of liability</h4><p>To the maximum extent allowed by law:</p><ul><li>We are **not liable for indirect, incidental, special, or consequential</li></ul><p>  damages** \u2014 including lost profits, lost or mispriced jobs, lost data, or</p><p>  business interruption \u2014 arising from use of the apps.</p><ul><li>Our total liability for any claim connected to an app is limited to the</li></ul><p>  <b>amount you paid for that app</b>.</p><ul><li>Nothing in these terms limits liability that cannot legally be limited.</li></ul><h4>8. Refunds</h4><p>Refunds are handled **by the storefront you bought from, under that</p><p>storefront's policy** \u2014 Gumroad's refund policy for Gumroad purchases, and</p><p>Google Play's refund policy for Play purchases. These terms do not add to,</p><p>replace, or override the storefront's refund rules. If a file is defective</p><p>and won't open, contact us at whitewolfoklahoma@gmail.com and we'll fix or</p><p>replace the file.</p><h4>9. Updates and changes to these terms</h4><ul><li>We may release updated versions of an app. Updates may add, change, or</li></ul><p>  remove features.</p><ul><li>We may update these terms. The version you agreed to is recorded in the</li></ul><p>  app (version number and date) at first-run acceptance. If terms change,</p><p>  the app may ask you to accept the new version once on next open. Updated</p><p>  terms apply going forward, not retroactively.</p><ul><li>If you don't agree to an updated version of the terms, stop using the app.</li></ul><h4>10. Governing law</h4><p>These terms are governed by the laws of the <b>State of Oklahoma</b>, USA.</p><p>(Attorney to confirm governing law and venue before publication.)</p><h4>11. Contact</h4><p>White Wolf Tree Service LLC (White Wolf Digital) \u2014</p><p>whitewolfoklahoma@gmail.com.</p><h4>CONNECTED FEATURES \u2014 takes effect only when these features ship</h4><p>*The sections below apply only to future connected features (device sync via</p><p>Health Connect, AI voice logging, and the AI Goal Preview in ForgeFit). They</p><p>do not apply to the current offline versions, which never transmit data.*</p><ul><li><b>Opt-in only.</b> Connected features are off by default. Each one asks for</li></ul><p>  your separate, explicit consent \u2014 on its own consent screen, in plain</p><p>  language \u2014 before anything leaves your device. Declining never disables</p><p>  the app's offline features.</p><ul><li><b>What gets sent.</b> Only what the consent screen names, only when you use</li></ul><p>  the feature: for example, a meal description (text, or audio only if cloud</p><p>  transcription is on) for AI voice logging, or the single photo you choose</p><p>  for an AI Goal Preview.</p><ul><li><b>No retention by us.</b> Our relay service passes your request to the named</li></ul><p>  AI provider and keeps nothing \u2014 no copies of your photos, audio,</p><p>  transcripts, or entries are stored on our servers. Provider handling is</p><p>  described on the consent screen and in the Privacy Policy.</p><ul><li><b>Health data stays on the device.</b> Device sync (Health Connect) reads</li></ul><p>  your health data on your phone and stores it in the app on your phone. It</p><p>  is not uploaded to us.</p><ul><li><b>Allowances.</b> Some connected features run on third-party AI services we</li></ul><p>  pay for per use, so they may include a monthly allowance described in the</p><p>  app (for example, a set number of AI previews or voice entries per month),</p><p>  with optional additional credits. Allowances and pricing will be shown in</p><p>  the app before you use the feature; they are not a subscription unless the</p><p>  app says so in plain words.</p><ul><li><b>Permissions.</b> Connected features may request device permissions (such</li></ul><p>  as Health Connect access or the microphone) at the moment you first use</p><p>  them. You can revoke permissions any time in your device settings; the</p><p>  related feature will simply stop working.</p>";
+var LEGAL_DISCLAIMER_HTML = "<h3>Estimator Disclaimer \u2014 Contractor &amp; Trade Tools</h3><p>**Applies to: TreeBid Pro, SnowBid, WashPrice Pro, RoofSquares, JobProfit</p><p>Tracker, FieldForms Toolkit, PaintPro, FenceDeck, MarketMaker, and the other</p><p>estimating/pricing tools sold under White Wolf Digital \u2014 including bundles</p><p>that contain them.**</p><h4>Estimating aids, not finished quotes</h4><ul><li>These apps are <b>estimating and record-keeping aids</b>. Every bid, price,</li></ul><p>  cost, measurement, and total they produce is an **estimate based on the</p><p>  information and rates you enter**.</p><ul><li>**You \u2014 the business owner \u2014 are responsible for verifying everything</li></ul><p>  before you quote a customer:** measurements and quantities, site</p><p>  conditions, your current material and labor costs, your rates and margins,</p><p>  taxes, permit and license requirements, disposal rules, and any contract</p><p>  terms.</p><ul><li>Default rates, presets, and sample data included in the apps are starting</li></ul><p>  points only. They are not market prices, not industry standards, and not</p><p>  a recommendation of what you should charge.</p><ul><li>A saved quote keeps the prices in effect when you created it (price</li></ul><p>  snapshot). Changing your presets later does not change saved quotes \u2014</p><p>  and a saved quote is still your responsibility to review before sending.</p><h4>Specific tools</h4><ul><li><b>TreeBid Pro:</b> tree work is dangerous and site-specific. Difficulty</li></ul><p>  factors and presets cannot see the actual tree, lean, rot, targets, or</p><p>  access. Inspect every job in person before final pricing. The \"Invoice</p><p>  with Wave\" feature is an open-and-paste handoff \u2014 TreeBid does not</p><p>  connect to Wave, and the invoice you send from Wave is yours.</p><ul><li><b>RoofSquares / measurement tools:</b> confirm roof measurements and pitch</li></ul><p>  in person or by your usual method before ordering materials.</p><ul><li><b>SnowBid / seasonal tools:</b> route times, snowfall amounts, and service</li></ul><p>  pricing vary by storm and site; seasonal contracts are your agreement</p><p>  with your customer, on your terms.</p><ul><li><b>JobProfit Tracker:</b> profit figures depend on the costs you enter.</li></ul><p>  The app is not accounting or tax software and does not replace your</p><p>  bookkeeper or accountant.</p><h4>Bottom line</h4><p>If an output and your judgment disagree, trust your judgment \u2014 then fix the</p><p>input. We are not responsible for jobs won, lost, or mispriced based on app</p><p>outputs, within the limits of the Terms of Use.</p>";
+(function(){
+  var lst = document.createElement("style");
+  lst.textContent = "@media print{ #legalOverlay{ display:none !important; } }";
+  document.head.appendChild(lst);
+})();
+function sanitizeLegal(v){
+  if(!v || typeof v !== "object") return null;
+  if(typeof v.termsVersion !== "string" || typeof v.acceptedDate !== "string") return null;
+  return { termsVersion: v.termsVersion.slice(0, 10), acceptedDate: v.acceptedDate.slice(0, 40), disclaimerShown: !!v.disclaimerShown };
+}
+function legalRecord(){
+  try{ var s = S; return (s && s.legal) ? sanitizeLegal(s.legal) : null; }catch(e){ return null; }
+}
+function legalVersionCmp(a, b){
+  var pa = String(a).split("."), pb = String(b).split(".");
+  for(var i = 0; i < 3; i++){ var d = (parseInt(pa[i], 10) || 0) - (parseInt(pb[i], 10) || 0); if(d) return d; }
+  return 0;
+}
+function legalAcceptLine(){
+  var rec = legalRecord();
+  if(rec && rec.acceptedDate) return "You agreed to Terms v" + rec.termsVersion + " on " + rec.acceptedDate.slice(0, 10) + ".";
+  return "No Terms acceptance is recorded on this device yet \u2014 the current Terms will be shown for your agreement.";
+}
+function legalSectionHTML(){
+  var h = '<div style="border-top:2px solid rgba(127,127,127,.35);margin-top:20px;padding-top:14px;">'
+    + '<h2>Legal</h2>'
+    + '<p>' + legalAcceptLine() + '</p>'
+    + '<h3>Terms of Use (v' + TERMS_VERSION + ')</h3>'
+    + '<div style="max-height:340px;overflow-y:auto;border:1px solid rgba(127,127,127,.4);border-radius:8px;padding:10px 14px;font-size:14px;line-height:1.55;">' + LEGAL_TERMS_HTML + '</div>';
+  if(LEGAL_HAS_DISCLAIMER){
+    h += '<h3>Estimator Disclaimer</h3>'
+      + '<div style="max-height:260px;overflow-y:auto;border:1px solid rgba(127,127,127,.4);border-radius:8px;padding:10px 14px;font-size:14px;line-height:1.55;">' + LEGAL_DISCLAIMER_HTML + '</div>';
+  }
+  h += '<h3>Privacy</h3>'
+    + '<p>This app collects no data. It has no accounts, no sign-in, no analytics, and no server \u2014 everything you enter is stored only on this device, in this browser\u2019s storage, and nothing is transmitted anywhere. Files you export (backups, quotes, prints) are under your control. You are responsible for backing up your records with the app\u2019s export tools.</p>'
+    + '<p>Sold by White Wolf Tree Service LLC (White Wolf Digital) \u2014 whitewolfoklahoma@gmail.com</p>'
+    + '</div>';
+  return h;
+}
+function legalFillSection(){
+  var el = document.getElementById("legalSection");
+  if(!el) return;
+  var sig = legalAcceptLine();
+  if(el.getAttribute("data-legal-filled") === sig) return;
+  el.innerHTML = legalSectionHTML(); el.setAttribute("data-legal-filled", sig);
+}
+function legalRefreshSection(){
+  var el = document.getElementById("legalSection");
+  if(el){ el.innerHTML = legalSectionHTML(); el.setAttribute("data-legal-filled", legalAcceptLine()); }
+}
+function legalShowOverlay(isUpdate){
+  if(document.getElementById("legalOverlay")) return;
+  var ov = document.createElement("div");
+  ov.id = "legalOverlay";
+  ov.setAttribute("style", "position:fixed;inset:0;z-index:99999;background:rgba(8,10,14,.74);overflow-y:auto;padding:20px 12px;display:flex;align-items:flex-start;justify-content:center;");
+  var discBtn = LEGAL_HAS_DISCLAIMER ? '<button type="button" id="legalReadDisc" style="min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid #9aa4b2;background:#ffffff;color:#1c2733;font-size:15px;cursor:pointer;">Read the Estimator Disclaimer</button>' : '';
+  var checkLabel = LEGAL_HAS_DISCLAIMER ? "I have read the disclaimer and I agree to the Terms of Use" : "I have read and I agree to the Terms of Use";
+  ov.innerHTML = '<div style="background:#ffffff;color:#1c2733;max-width:560px;width:100%;border-radius:14px;padding:22px 20px;box-shadow:0 18px 50px rgba(0,0,0,.45);font-size:15px;line-height:1.55;">'
+    + '<h2 style="margin:0 0 6px;font-size:21px;">' + LEGAL_APP_NAME + ' \u2014 Terms of Use</h2>'
+    + (isUpdate ? '<p style="background:#fdf3d7;border:1px solid #e4cf8a;border-radius:8px;padding:8px 10px;"><b>Our terms were updated (v' + TERMS_VERSION + ').</b></p>' : '')
+    + '<p style="font-size:16px;"><b>Your data stays on your device.</b><br><b>Estimates are aids, not guarantees.</b><br><b>You\'re responsible for checking outputs before you rely on them.</b></p>'
+    + '<p>The full Terms' + (LEGAL_HAS_DISCLAIMER ? ' and Disclaimer are' : ' are') + ' one tap away, now and any time in Settings \u2192 Legal.</p>'
+    + '<div id="legalReader" style="display:none;max-height:44vh;overflow-y:auto;border:1px solid #d5dbe3;border-radius:10px;padding:10px 14px;margin:10px 0;font-size:14px;"></div>'
+    + '<p style="display:flex;gap:8px;flex-wrap:wrap;"><button type="button" id="legalReadTerms" style="min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid #9aa4b2;background:#ffffff;color:#1c2733;font-size:15px;cursor:pointer;">Read the full Terms</button>' + discBtn + '</p>'
+    + '<label style="display:flex;gap:10px;align-items:flex-start;margin:12px 0;cursor:pointer;"><input type="checkbox" id="legalCheck" style="width:22px;height:22px;min-width:22px;margin-top:1px;cursor:pointer;"><span>' + checkLabel + '</span></label>'
+    + '<button type="button" id="legalAgree" disabled style="min-height:52px;width:100%;border:0;border-radius:10px;background:#1f5fa8;color:#ffffff;font-size:17px;font-weight:700;cursor:pointer;opacity:.55;">I Agree</button>'
+    + '<p style="font-size:13px;color:#5a6675;margin-bottom:0;">Your records stay loaded behind this screen and are never deleted or locked, whether or not you agree now.</p>'
+    + '</div>';
+  document.body.appendChild(ov);
+  var reader = ov.querySelector("#legalReader");
+  var showing = "";
+  function toggleReader(kind){
+    if(showing === kind){ reader.style.display = "none"; showing = ""; return; }
+    reader.innerHTML = kind === "terms" ? LEGAL_TERMS_HTML : LEGAL_DISCLAIMER_HTML;
+    reader.style.display = "block"; showing = kind;
+    reader.scrollTop = 0;
+  }
+  ov.querySelector("#legalReadTerms").addEventListener("click", function(){ toggleReader("terms"); });
+  var db = ov.querySelector("#legalReadDisc");
+  if(db) db.addEventListener("click", function(){ toggleReader("disc"); });
+  var legalChk = ov.querySelector("#legalCheck");
+  var legalAgreeBtn = ov.querySelector("#legalAgree");
+  legalChk.addEventListener("change", function(){ legalAgreeBtn.disabled = !legalChk.checked; legalAgreeBtn.style.opacity = legalChk.checked ? "1" : ".55"; });
+  legalAgreeBtn.addEventListener("click", function(){
+    if(!legalChk.checked) return;
+    try{ S.legal = { termsVersion: TERMS_VERSION, acceptedDate: new Date().toISOString(), disclaimerShown: LEGAL_HAS_DISCLAIMER }; save(); }catch(e){}
+    if(ov.parentNode) ov.parentNode.removeChild(ov);
+    legalRefreshSection();
+  });
+}
+function legalInit(){
+  legalFillSection();
+  var rec = legalRecord();
+  if(rec && legalVersionCmp(rec.termsVersion, TERMS_VERSION) >= 0) return;
+  legalShowOverlay(!!rec);
+}
+if(typeof MutationObserver !== "undefined"){
+  var legalObs = new MutationObserver(function(){ legalFillSection(); });
+  legalObs.observe(document.documentElement, { childList: true, subtree: true });
+}
+if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", function(){ setTimeout(legalInit, 30); });
+else setTimeout(legalInit, 30);
+
+</script>
+</body>
+</html>
